@@ -9,6 +9,7 @@ import Genres from "./genres";
 import { BsPlayFill } from "react-icons/bs";
 import { FaBullseye } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
+import ReactPlayer from "react-player";
 interface IMovie {
   poster_path: string;
   title: string;
@@ -156,6 +157,13 @@ const Home = () => {
           </div>
           <div className="relative pt-[56%]">
             <ReactPlayer
+              url={trailer}
+              width="100%"
+              height="100%"
+              style={{ position: "absolute", top: "0", left: "0" }}
+              controls={true}
+              playing={showPlayer}
+            />
           </div>
         </div>
       </div>

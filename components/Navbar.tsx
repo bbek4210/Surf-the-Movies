@@ -14,16 +14,16 @@ const Navbar = () => {
   };
 
   return (
-    <div className="bg-red-200 py-4 px-4 md:px-0">
+    <div className="bg-purple-500 py-4 px-4 md:px-0">
       <div className="flex mx-auto justify-between items-center">
         <Link href="/">
-          <div className="text-[30px] font-medium">Logo</div>
+          <div className="text-[30px] font-medium text-white">Logo</div>
         </Link>
 
         <form onSubmit={searchMovies}>
           <div className="space-x-4">
             <input
-              className="bg-gray-600 px-4 py-2 outline-none placeholder:text-blue-500"
+              className="bg-gray-600 px-4 py-2 outline-none placeholder:text-blue-500 text-white"
               type="text"
               value={input}
               placeholder="Search a movie..."

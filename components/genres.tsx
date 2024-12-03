@@ -8,7 +8,7 @@ interface IGenres {
 const Genres: React.FC<IGenres> = ({ index, name, length }) => {
   return (
     <div className="flex gap-4 text-white hover:text-red-600 cursor-pointer">
-      <div>{name}</div>
+      <div className="text-lg">{name}</div>
       <div className="text-white">{index + 1 !== length ? "/" : ""}</div>
     </div>
   );

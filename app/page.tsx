@@ -3,7 +3,7 @@ import React from "react";
 
 const page = () => {
   return (
-    <div>
+    <div className="bg-purple-500 h-screen">
       <Home />
     </div>
   );
