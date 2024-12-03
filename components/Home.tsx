@@ -42,21 +42,31 @@ interface IRelatedMovie {
 
 const Home = () => {
   const searchParams = useSearchParams();
+
   const [isLoading, setIsLoading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [movie, setMovie] = useState<IMovie>();
   const [showPlayer, setShowPlayer] = useState(false);
   const [trailer, setTrailer] = useState("");
   const [relatedMovies, setRelatedMovies] = useState<IRelatedMovie[]>([]);
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasMounted) return;
+
     setIsLoading(true);
     setIsImageLoading(true);
 
     let searchMovie = searchParams.get("movie");
     if (searchMovie === null) {
       searchMovie = "Iron Man";
-    }
+  }
+
+ 
 
     axios
       .get(`http://api.themoviedb.org/3/search/movie`, {
