@@ -102,6 +102,20 @@ const Home = () => {
     setTrailer(trailerURL);
   }, [movie]);
 
+  const handleRelatedMovieClick = (movieId: number) => {
+    setIsLoading(true);
+    setIsImageLoading(true);
+    axios
+      .get(
+        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.NEXT_PUBLIC_API_KEY}&append_to_response=videos`
+      )
+      .then((res) => {
+        setMovie(res?.data);
+        setIsImageLoading(false);
+        setIsLoading(false);
+      });
+  };
+
   return (
     <div className="bg-gradient-to-br from-gray-900 via-purple-800 to-purple-500 relative px-4 md:px-0">
       {isLoading && <Loading />}
@@ -179,6 +193,7 @@ const Home = () => {
             {relatedMovies.map((relatedMovie) => (
               <div
                 key={relatedMovie.id}
+                onClick={() => handleRelatedMovieClick(relatedMovie.id)}
                 className="flex-none w-[150px] hover:scale-105 transition-transform duration-300"
               >
                 <Image
