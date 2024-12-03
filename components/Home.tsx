@@ -106,7 +106,7 @@ const Home = () => {
     <div className="bg-gradient-to-br from-gray-900 via-purple-800 to-purple-500 relative px-4 md:px-0">
       {isLoading && <Loading />}
 
-      <div className="mx-auto min-h[calc(100vh-77px)] flex items-center relative">
+      <div className="mx-auto min-h[calc(100vh-77px)] flex flex-col gap-10  relative">
         <div className="flex flex-col lg:flex-row gap-10 lg:mx-10 py-20">
           <div className="mx-auto flex-none relative">
             <Image
