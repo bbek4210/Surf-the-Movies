@@ -34,6 +34,12 @@ interface IMovie {
   };
 }
 
+interface IRelatedMovie {
+  id: number;
+  title: string;
+  poster_path: string;
+}
+
 const Home = () => {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +47,7 @@ const Home = () => {
   const [movie, setMovie] = useState<IMovie>();
   const [showPlayer, setShowPlayer] = useState(false);
   const [trailer, setTrailer] = useState("");
+  const [relatedMovies, setRelatedMovies] = useState<IRelatedMovie[]>([]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -59,14 +66,27 @@ const Home = () => {
         },
       })
       .then((res) => {
+        const movieId = res?.data?.results[0]?.id;
+
         axios
           .get(
-            `https://api.themoviedb.org/3/movie/${res?.data?.results[0]?.id}?api_key=${process.env.NEXT_PUBLIC_API_KEY}&append_to_response=videos`
+            `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.NEXT_PUBLIC_API_KEY}&append_to_response=videos`
           )
           .then((res) => {
             setMovie(res?.data);
             setIsImageLoading(false);
-            console.log(res.data);
+            setIsLoading(false);
+
+            axios
+              .get(
+                `https://api.themoviedb.org/3/movie/${movieId}/recommendations`,
+                {
+                  params: { api_key: process.env.NEXT_PUBLIC_API_KEY },
+                }
+              )
+              .then((res) => {
+                setRelatedMovies(res.data.results);
+              });
           });
       });
   }, [searchParams]);
@@ -83,7 +103,7 @@ const Home = () => {
   }, [movie]);
 
   return (
-    <div className="bg-purple relative px-4 md:px-0">
+    <div className="bg-gradient-to-br from-gray-900 via-purple-800 to-purple-500 relative px-4 md:px-0">
       {isLoading && <Loading />}
 
       <div className="mx-auto min-h[calc(100vh-77px)] flex items-center relative">
@@ -94,14 +114,14 @@ const Home = () => {
               width={700}
               height={700}
               src={`https://image.tmdb.org/t/p/w500/${movie?.poster_path}`}
-              className="w-[300px] object-cover "
+              className="w-[300px] object-cover rounded-lg shadow-lg "
               onLoadingComplete={() => setIsImageLoading(false)}
               priority
             />
             {isImageLoading && <Loading />}
           </div>
           <div className="space-y-6">
-            <div className="uppercase -translate-y-3 text-[26px] md:text-[34px] font-medium pr-4 text-white">
+            <div className="uppercase text-[26px] md:text-[34px] font-medium text-yellow-400">
               {" "}
               {movie?.title}
             </div>
@@ -117,17 +137,29 @@ const Home = () => {
             </div>
 
             <div className="flex flex-col md:flex-row gap-2 md:gap-6 text-white">
-              <div className="">
-                Language:{movie?.original_language?.toUpperCase()}
+              <div className="text-blue-400">
+                Language:{"  "}
+                {movie?.original_language?.toUpperCase()}
               </div>
-              <div>Release:{movie?.release_date}</div>
-              <div>Runtime:{movie?.runtime} MIN.</div>
-              <div>Rating:{movie?.vote_average}</div>
+              <div className="text-green-400">
+                Release:{"  "}
+                {movie?.release_date}
+              </div>
+              <div className="text-pink-400">
+                Runtime:{"  "}
+                {movie?.runtime} MIN.
+              </div>
+              <div className="text-yellow-300">
+                Rating:{"  "}
+                {movie?.vote_average} ⭐
+              </div>
             </div>
 
             <div className="pt-14 space-y-2 pr-4 text-white">
-              <div>OVERVIEW:</div>
-              <div className="lg:line-clamp-4">{movie?.overview}</div>
+              <div className="text-red-400 font-semibold">OVERVIEW:</div>
+              <div className=" text-gray-200lg:line-clamp-4">
+                {movie?.overview}
+              </div>
             </div>
             <div
               className="inline-block pt-6 cursor-pointer"
@@ -141,6 +173,29 @@ const Home = () => {
           </div>
         </div>
 
+        <div className="py-10">
+          <h2 className="text-2xl text-white font-bold mb-4">Related Movies</h2>
+          <div className="flex gap-4 overflow-x-auto">
+            {relatedMovies.map((relatedMovie) => (
+              <div
+                key={relatedMovie.id}
+                className="flex-none w-[150px] hover:scale-105 transition-transform duration-300"
+              >
+                <Image
+                  alt={relatedMovie.title}
+                  width={150}
+                  height={225}
+                  src={`https://image.tmdb.org/t/p/w500/${relatedMovie.poster_path}`}
+                  className="rounded-lg shadow-md"
+                />
+                <p className="text-sm text-center text-gray-200 mt-2">
+                  {relatedMovie.title}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div
           className={`absolute top-3 inset-x-[7%] md:inset-x-[13%] rounded overflow-hidden transition duration-1000 ${
             showPlayer ? "opacity-100 z-50" : "opacity-0 -z-10"
@@ -149,7 +204,7 @@ const Home = () => {
           <div className="flex items-center justify-between bg-black text-white p-3">
             <span className="font-semibold">Playing Trailer</span>
             <div
-              className="cursor-pointer w-8 h-8 flex justify-center items-center rounded-lg opacity-50 hover:opacity-75 hover:bg-[#35eb35]"
+              className="cursor-pointer w-8 h-8 flex justify-center items-center rounded-lg opacity-50 hover:opacity-75 hover:bg-gray-700"
               onClick={() => setShowPlayer(false)}
             >
               <IoMdClose className="h-5" />
