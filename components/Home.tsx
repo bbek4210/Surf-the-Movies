@@ -83,6 +83,13 @@ const Home = ({
         if (movies && movies.length > 0) {
           const movie = movies[0];
 
+          const movieDetailsResponse = await axios.get(
+            `https://api.themoviedb.org/3/movie/${movie.id}`,
+            {
+              params: { api_key: apiKey, append_to_response: "videos" },
+            }
+          );
+
           const recommendationsResponse = await axios.get(
             `https://api.themoviedb.org/3/movie/${movie.id}/recommendations`,
             {
@@ -90,7 +97,7 @@ const Home = ({
             }
           );
 
-          setMovie(movie);
+          setMovie(movieDetailsResponse.data);
           setRecommendations(recommendationsResponse.data.results);
         } else {
           setMovie(null);
