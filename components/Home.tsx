@@ -6,6 +6,7 @@ import axios from "axios";
 import ReactPlayer from "react-player";
 import { BsPlayFill } from "react-icons/bs";
 import { IoMdClose } from "react-icons/io";
+import { useSearchParams } from "next/navigation";
 
 interface IMovie {
   poster_path: string;
@@ -46,7 +47,10 @@ const Home = ({
   movie: initialMovie,
   recommendations: initialRecommendations,
 }: HomeProps) => {
-  const [movie, setMovie] = useState<IMovie>(initialMovie);
+  const searchParams = useSearchParams();
+  const movieQuery = searchParams.get("movie");
+
+  const [movie, setMovie] = useState<IMovie | null>(initialMovie);
   const [recommendations, setRecommendations] = useState<IRelatedMovie[]>(
     initialRecommendations
   );
@@ -56,11 +60,59 @@ const Home = ({
     (video) => video.type === "Trailer"
   )?.key;
 
+  useEffect(() => {
+    const fetchMovieByQuery = async () => {
+      if (!movieQuery) return;
+
+      try {
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+        // Fetch movies based on the search query
+        const searchResponse = await axios.get(
+          `https://api.themoviedb.org/3/search/movie`,
+          {
+            params: {
+              api_key: apiKey,
+              query: movieQuery,
+              append_to_response: "videos",
+            },
+          }
+        );
+
+        const movies = searchResponse.data.results;
+
+        if (movies && movies.length > 0) {
+          const movie = movies[0];
+
+          // Fetch recommendations for the selected movie
+          const recommendationsResponse = await axios.get(
+            `https://api.themoviedb.org/3/movie/${movie.id}/recommendations`,
+            {
+              params: { api_key: apiKey },
+            }
+          );
+
+          setMovie(movie);
+          setRecommendations(recommendationsResponse.data.results);
+        } else {
+          setMovie(null);
+          setRecommendations([]);
+        }
+      } catch (error) {
+        console.error(
+          "Failed to fetch movie data based on search query:",
+          error
+        );
+      }
+    };
+
+    fetchMovieByQuery();
+  }, [movieQuery]);
+
   const handleRelatedMovieClick = async (movieId: number) => {
     try {
       const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
-    
       const movieResponse = await axios.get(
         `https://api.themoviedb.org/3/movie/${movieId}`,
         {
@@ -84,7 +136,7 @@ const Home = ({
 
   return (
     <div className="bg-gradient-to-br from-gray-900 via-purple-800 to-purple-500 relative px-4 md:px-0">
-      <div className="mx-auto min-h[calc(100vh-77px)] flex flex-col gap-10  relative">
+      <div className="mx-auto min-h[calc(100vh-77px)] flex flex-col gap-10 relative">
         <div className="flex flex-col lg:flex-row gap-10 lg:mx-10 py-20">
           <div className="mx-auto flex-none relative">
             <Image
@@ -94,55 +146,63 @@ const Home = ({
               src={
                 movie?.poster_path
                   ? `https://image.tmdb.org/t/p/w500/${movie?.poster_path}`
-                  : "/image.png" 
+                  : "/image.png"
               }
               className="w-[300px] object-cover rounded-lg shadow-lg"
               priority
             />
           </div>
           <div className="space-y-6">
-            <div className="uppercase text-[26px] md:text-[34px] font-medium text-yellow-400">
-              {movie?.title}
-            </div>
-            <div className="flex gap-4 flex-wrap">
-              {movie?.genres?.map((genre, index) => (
-                <div
-                  key={genre?.id}
-                  className="text-gray-200 bg-purple-600 px-3 py-1 rounded"
-                >
-                  {genre?.name}
+            {movie ? (
+              <>
+                <div className="uppercase text-[26px] md:text-[34px] font-medium text-yellow-400">
+                  {movie?.title}
                 </div>
-              ))}
-            </div>
+                <div className="flex gap-4 flex-wrap">
+                  {movie?.genres?.map((genre) => (
+                    <div
+                      key={genre?.id}
+                      className="text-gray-200 bg-purple-600 px-3 py-1 rounded"
+                    >
+                      {genre?.name}
+                    </div>
+                  ))}
+                </div>
 
-            <div className="flex flex-col md:flex-row gap-2 md:gap-6 text-white">
-              <div className="text-blue-400">
-                Language: {movie?.original_language?.toUpperCase()}
-              </div>
-              <div className="text-green-400">
-                Release: {movie?.release_date}
-              </div>
-              <div className="text-pink-400">
-                Runtime: {movie?.runtime} MIN.
-              </div>
-              <div className="text-yellow-300">
-                Rating: {movie?.vote_average} ⭐
-              </div>
-            </div>
+                <div className="flex flex-col md:flex-row gap-2 md:gap-6 text-white">
+                  <div className="text-blue-400">
+                    Language: {movie?.original_language?.toUpperCase()}
+                  </div>
+                  <div className="text-green-400">
+                    Release: {movie?.release_date}
+                  </div>
+                  <div className="text-pink-400">
+                    Runtime: {movie?.runtime} MIN.
+                  </div>
+                  <div className="text-yellow-300">
+                    Rating: {movie?.vote_average} ⭐
+                  </div>
+                </div>
 
-            <div className="pt-14 space-y-2 pr-4 text-white">
-              <div className="text-red-400 font-semibold">OVERVIEW:</div>
-              <div className="text-gray-200">{movie?.overview}</div>
-            </div>
-            <div
-              className="inline-block pt-6 cursor-pointer"
-              onClick={() => setShowPlayer(true)}
-            >
-              <div className="flex gap-2 items-center bg-white text-black px-4 py-2 mb-6 hover:bg-red-600">
-                <BsPlayFill size={24} />
-                Watch Trailer
+                <div className="pt-14 space-y-2 pr-4 text-white">
+                  <div className="text-red-400 font-semibold">OVERVIEW:</div>
+                  <div className="text-gray-200">{movie?.overview}</div>
+                </div>
+                <div
+                  className="inline-block pt-6 cursor-pointer"
+                  onClick={() => setShowPlayer(true)}
+                >
+                  <div className="flex gap-2 items-center bg-white text-black px-4 py-2 mb-6 hover:bg-red-600">
+                    <BsPlayFill size={24} />
+                    Watch Trailer
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="text-center text-gray-200">
+                No movie found for "{movieQuery}".
               </div>
-            </div>
+            )}
           </div>
         </div>
 
