@@ -37,7 +37,7 @@ interface IRelatedMovie {
 
 const fetchData = async () => {
   const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-  const movieName = "Iron Man"; 
+  const movieName = "Stranger Things"; 
   const searchResponse = await axios.get(
     `https://api.themoviedb.org/3/search/movie`,
     {
