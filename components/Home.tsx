@@ -133,11 +133,16 @@ const Home = () => {
               alt="movie-poster"
               width={700}
               height={700}
-              src={`https://image.tmdb.org/t/p/w500/${movie?.poster_path}`}
-              className="w-[300px] object-cover rounded-lg shadow-lg "
+              src={
+                movie?.poster_path
+                  ? `https://image.tmdb.org/t/p/w500/${movie?.poster_path}`
+                  : "/fallback-image.png"
+              }
+              className="w-[300px] object-cover rounded-lg shadow-lg"
               onLoadingComplete={() => setIsImageLoading(false)}
               priority
             />
+
             {isImageLoading && <Loading />}
           </div>
           <div className="space-y-6">
