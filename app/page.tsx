@@ -1,20 +1,4 @@
-// import Home from "@/components/Home";
-// import React, { Suspense } from "react";
 
-// const page = () => {
-//   return (
-//     <Suspense fallback={<div>Loading...</div>}>
-//       <div className="bg-gradient-to-br from-gray-900 via-purple-800 to-purple-500 h-screen">
-//         <div className="container mx-auto p-4 pt-6">
-//           {" "}
-//           <Home  />
-//         </div>
-//       </div>
-//     </Suspense>
-//   );
-// };
-
-// export default page;
 
 
 import React, { Suspense } from "react";
@@ -53,7 +37,7 @@ interface IRelatedMovie {
 
 const fetchData = async () => {
   const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-  const movieName = "Iron Man"; // Default movie
+  const movieName = "Iron Man"; 
   const searchResponse = await axios.get(
     `https://api.themoviedb.org/3/search/movie`,
     {

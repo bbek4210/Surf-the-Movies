@@ -7,17 +7,11 @@ const Navbar = () => {
   const [input, setInput] = useState("");
   const router = useRouter();
 
-  // const searchMovies = (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   router.push(`?movie=${input}`);
-  //   setInput("");
-  // };
-
+ 
   const searchMovies = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (input.trim()) {
-      // Construct the URL with query parameters
       const searchQuery = `/?movie=${encodeURIComponent(input.trim())}`;
       router.push(searchQuery);
       setInput("");

@@ -67,7 +67,6 @@ const Home = ({
       try {
         const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
-        // Fetch movies based on the search query
         const searchResponse = await axios.get(
           `https://api.themoviedb.org/3/search/movie`,
           {
@@ -84,7 +83,6 @@ const Home = ({
         if (movies && movies.length > 0) {
           const movie = movies[0];
 
-          // Fetch recommendations for the selected movie
           const recommendationsResponse = await axios.get(
             `https://api.themoviedb.org/3/movie/${movie.id}/recommendations`,
             {
@@ -130,7 +128,6 @@ const Home = ({
       setMovie(movieResponse.data);
       setRecommendations(recommendationsResponse.data.results);
     } catch (error) {
-      console.error("Failed to fetch related movie data:", error);
     }
   };
 
