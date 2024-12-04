@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import Loading from "./Loading";
 import Image from "next/image";
@@ -64,9 +62,7 @@ const Home = () => {
     let searchMovie = searchParams.get("movie");
     if (searchMovie === null) {
       searchMovie = "Iron Man";
-  }
-
- 
+    }
 
     axios
       .get(`http://api.themoviedb.org/3/search/movie`, {
